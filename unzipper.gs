@@ -46,7 +46,7 @@ function __clearDb() {
   }
 }
 
-function countItemsInDb() {
+function __countItemsInDb() {
   var db = ScriptDb.getMyDb();
   result = db.query({});
   Logger.log(result.getSize());
@@ -74,9 +74,20 @@ function __createWorkloads(zipFileId, extractionFolderId, unzippedBlobs) {
   var result = db.saveBatch(workloads, false);
   if (db.allOk(result)) { Logger.log("All saved!"); } else { Logger.log("I DON'T UNDERSTAND!!!"); }
   
+  for (var i = 0; i < 5; ++i) {
+    __spawnWorker();
+  }
 }
 
 function __spawnWorker() {
+  // One-time execution only
+  // Use JavaScript Date of 5/17/2012
+  var date = new Date();
+  date.setSeconds(date.getSeconds() + 10);
+  var oneTimeOnly = ScriptApp.newTrigger("__doWork")
+      .timeBased()
+      .at(date)
+      .create();
 }
 
 function __doWork() { //Function called by Timed Trigger (a.k.a. "a worker").
